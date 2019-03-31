@@ -151,22 +151,22 @@ class MyPromise<Value> {
 }
 
 const p1 = new MyPromise<any>((res, rej) => {
-    throw('error');
+    // throw('error'); 
     res(1);
 })
 
-const p2 = p1.then(val => {
+p1.then(val => {
     console.log('res:', val);
 }, e => console.log('rej: ', e));
 
-// const p2 = p1.then(res => {
-//     return new MyPromise((res, rej) => {
-//         // res(2)
-//         res(new MyPromise((_res, _rej) => {
-//             _res(3)
-//         }));
-//     })
-// })
+const p2 = p1.then(res => {
+    return new MyPromise((res, rej) => {
+        // res(2)
+        res(new MyPromise((_res, _rej) => {
+            _res(3)
+        }));
+    })
+})
 
 p2.then(val => {
     console.log('res:', val);
