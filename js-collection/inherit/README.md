@@ -24,6 +24,7 @@ console.log(bob.name, jack.name); // bob, jack
 这里创建了一个构造函数Person，并使用new关键字构造了两个实例bob和jack，他们都拥有一个name属性，两者之间**互不干扰**，接下来将bob和jack同时打印出来；
 
 ![1.jpg](https://github.com/hyden-tan/blog/raw/master/js-collection/inherit/images/1.png)
+
 可以看到出了name属性之外，还包含了一个`__proto__`属性:
 > 遵循ECMAScript标准，someObject.[[Prototype]] 符号是用于指向 someObject的原型。从 ECMAScript 6 开始，[[Prototype]] 可以通过 Object.getPrototypeOf() 和 Object.setPrototypeOf() 访问器来访问。这个等同于 JavaScript 的非标准但许多浏览器实现的属性 `__proto__`。
 
