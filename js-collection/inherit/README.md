@@ -2,7 +2,7 @@
 
 ## JS中的类
 
-继承来自与面向对象语言，如果一个类B“继承自”另一个类A，就把这个B称为“A的子类”，而把A称为“B的父类”也可以称“A是B的超类(super)”。子类具有父类的属性和方法，达到代码复用的目的。在ES6之前，JS中是没有类的概念的，包括ES6以后的class也是语法糖的实现。JS中的继承是依赖**原型**实现的，至于JS中为甚么没有‘类’，以及**原型**的由来，[阮一峰老师这儿讲的很清楚](http://www.ruanyifeng.com/blog/2011/06/designing_ideas_of_inheritance_mechanism_in_javascript.html)。
+继承来自面向对象语言，如果一个类B“继承自”另一个类A，就把这个B称为“A的子类”，而把A称为“B的父类”也可以称“A是B的超类(super)”。子类具有父类的属性和方法，达到代码复用的目的。继承是类三大特性（封装、继承、多态）之一，在ES6之前，JS中是没有类的概念的，包括ES6以后的class也是语法糖的实现。JS中的继承是依赖**原型**实现的，至于JS中为甚么没有‘类’，以及**原型**的由来，[阮一峰老师这儿讲的很清楚](http://www.ruanyifeng.com/blog/2011/06/designing_ideas_of_inheritance_mechanism_in_javascript.html)。
 
 ## 原型与原型链
 
@@ -62,7 +62,21 @@ Person.prototype.constructor === Person; // true
 bob.__proto__.sayName(); // undefind: this指向prototype,其没有name属性
 ```
 
-原因是在访问对象的属性时，首先在其本身即this上查找，当没有找到该属性时就到对象的原型上去查找。这里很容易想到属性屏蔽的问题，即实例和其原型具有相同属性名的属性是，原型上的该属性将不可见。接下来再看一个例子：
+原因是在访问对象的属性时，首先在其本身即this上查找，当没有找到该属性时就到对象的原型上去查找。这里很容易想到属性屏蔽的问题，即实例和其原型具有相同属性名的属性是，原型上的该属性将不可见。
+
+```javascript
+Person.prototype.__proto__ === Object.prototype; // true
+Object.prototype.__proto__ === null;             // true
+```
+
+可以看到，构造函数的默认(这里说默认是因为构造函数的原型对象可以重写)原型对象是Object的实例，其`[[prototype]]`指向Object的原型，而Object的原型对象已经到头了，所以Object的原型对象的`[[prototype]]`为null。
+
+看下面这个例子：
+
+```javascript
+
+
+```
 
 ## 继承的几种实现方式
 
