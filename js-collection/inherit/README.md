@@ -52,7 +52,11 @@ console.log(bob.sayName(), jack.sayName()); // 'bob' 'jack'
 
 ```javascript
 Person.prototype.constructor === Person; // true
+Person.prototype.__proto__ === Object.prototype; // true
+Object.prototype.__proto__ === null;             // true
 ```
+
+可以看到，构造函数的默认(这里说默认是因为构造函数的原型对象可以重写)原型对象是Object的实例，其`[[prototype]]`指向Object的原型，而Object的原型对象已经到头了，所以Object的原型对象的`[[prototype]]`为null。
 
 ### 原型链
 
@@ -64,21 +68,100 @@ bob.__proto__.sayName(); // undefind: this指向prototype,其没有name属性
 
 原因是在访问对象的属性时，首先在其本身即this上查找，当没有找到该属性时就到对象的原型上去查找。这里很容易想到属性屏蔽的问题，即实例和其原型具有相同属性名的属性是，原型上的该属性将不可见。
 
-```javascript
-Person.prototype.__proto__ === Object.prototype; // true
-Object.prototype.__proto__ === null;             // true
-```
-
-可以看到，构造函数的默认(这里说默认是因为构造函数的原型对象可以重写)原型对象是Object的实例，其`[[prototype]]`指向Object的原型，而Object的原型对象已经到头了，所以Object的原型对象的`[[prototype]]`为null。
-
 看下面这个例子：
 
 ```javascript
+function A () {}
+A.prototype.sayHi = function () {
+    console.log('Hi');
+}
 
+function B () {}
+B.prototype = new A();
 
+const instance = new B();
+instance.sayHi();   // Hi
 ```
 
+在A上定义了sayHi, 然后定义了B，并将其原型改写为A的实例，创建一个B的实例instance，其访问sayHi的顺序如下:
+
+instance自身(空对象) -> instance.__proto__(A的实例，也是一个空对象) -> instance.__proto__.__proto__（A的原型，找到sayHi）
+
+当实例本身上并不存在该属性时，会访问其原型，由于原型本身也是一个对象，如果访问不到的话就继续访问原型的原型，不断回溯，直到找到该属性或者到null。这个过程相当于是一次链表的查找，这就是原型链的由来。
+
+### 引申：Function & Object 鸡蛋问题
+
+附上一片[文章](https://mp.weixin.qq.com/s/4eBdJTGBIrB5JhvRrmmbaw)
+
 ## 继承的几种实现方式
+
+继承本身也像是一条链，所以虽然JS中没有”真正的类“,但通过原型链也可以实现继承，接下来就谈谈几种继承的实现方式，大部分内容来自《js高级程序设计》，很香。
+
+### 借用构造函数
+
+```javascript
+function SuperType(){
+    this.colors = ["red", "blue", "green"];
+}
+SuperType.prototype.mention = '借用构造函数无法继承原型上的属性';
+
+function SubType(){
+    SuperType.call(this);
+}
+
+const instance1 = new SubType();
+const instance2 = new SubType();
+
+instance1.colors.push("black");
+
+console.log(instance1.colors);    //"red,blue,green,black"
+console.log(instance2.colors);    //"red,blue,green"
+console.log(instance1.mention);   // undefind
+```
+
+所谓的“借调”即通过使用 call()方法(或 apply()方法 也可以)在子类的构造函数中调用父类构造函数，因为子类的this绑定给了父类构造函数,所以父类的构造函数里的属性就会添加到子类的实例上，实际上相当于用父类的构造函数对子类构造函数进行了扩展。但像代码中展现的一样，劣势很明显，无法继承（链接到）父类的prototype， 而其优势在于可以向父类构造函数传参。
+
+### 组合继承
+
+```javascript
+function SuperType(name){
+        this.name = name;
+        this.colors = ["red", "blue", "green"];
+}
+SuperType.prototype.sayName = function(){
+    console.log(this.name);
+}
+
+function SubType(name, age){
+    SuperType.call(this, name);
+    this.age = age;
+}
+SubType.prototype = new SuperType();
+SubType.prototype.constructor = SubType;
+SubType.prototype.sayAge = function(){
+    console.log(this.age);
+};
+
+const instance1 = new SubType("Nicholas", 29);
+instance1.colors.push("black");
+
+console.log(instance1.colors);  //"red,blue,green,black"
+instance1.sayName();    //"Nicholas";
+instance1.sayAge(); // 29
+
+const instance2 = new SubType("Greg", 27);
+console.log(instance2.colors);  //"red,blue,green"
+instance2.sayName();    //"Greg";
+instance2.sayAge(); //27
+```
+
+组合继承相当于是借用构造函数的加强版，通过将父类的实例重写子类的原型，这样子类的原型就可以链接到父类的原型。这里需要注意一个小细节：
+
+```javascript
+SubType.prototype.constructor = SubType;
+```
+
+构造函数的原型对象上的constructor指向构造函数本身，这里因为重新赋值被改写了，所以需要修正回来。
 
 ## ES6中的继承
 
