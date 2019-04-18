@@ -163,6 +163,28 @@ SubType.prototype.constructor = SubType;
 
 构造函数的原型对象上的constructor指向构造函数本身，这里因为重新赋值被改写了，所以需要修正回来。
 
+### 原型继承
+
+```javascript
+function object(o) {
+    function f() {}
+    f.prototype = o;
+    return new f();
+}
+const parent = {
+    name: 'parent',
+    colors: ['black', 'red'],
+}
+const o1 = object(parent);  
+const o2 = object(parent);
+
+console.log(o1.colors); // ["black", "red"]
+console.log(o2.colors); // ["black", "red"]
+
+o1.colors.push('green');
+console.log(o2.colors); // ["black", "red", "green"]
+```
+
 ## ES6中的继承
 
 ## 总结
