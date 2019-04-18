@@ -163,6 +163,8 @@ SubType.prototype.constructor = SubType;
 
 构造函数的原型对象上的constructor指向构造函数本身，这里因为重新赋值被改写了，所以需要修正回来。
 
+组合继承有个缺点，父类的构造函数会被调用两次，一次是创建实例给子类的prototype，另一次是在子类的构造函数里面借调的。
+
 ### 原型继承
 
 ```javascript
@@ -184,6 +186,53 @@ console.log(o2.colors); // ["black", "red"]
 o1.colors.push('green');
 console.log(o2.colors); // ["black", "red", "green"]
 ```
+
+原型继承大致可以描述为: 创建一个给定原型的对象。ECMAScript 5 通过新增 Object.create()方法规范化了原型式继承。其行为与上述方式相同。
+
+### 寄生式继承
+
+```javascript
+function createAnother(origin) {
+    const clone = object(origin);
+    clone.sayHi = function () {
+        return 'Hi';
+    }
+}
+```
+
+寄生式继承的思路与寄生构造函数和工厂模式类似，即创建一个**仅用于封装继承过程**的函数，该函数在内部以**某种方式**来增强对象。
+
+> 使用寄生式继承来为对象添加函数，会由于不能做到函数复用而降低效率; 这一点与构造函数模式类似。
+
+### 寄生组合式继承
+
+```javascript
+function inheritPrototype(subType, superType){
+    var prototype = object(superType.prototype);
+    prototype.constructor = subType;
+    subType.prototype = prototype;
+}
+
+function SuperType(name){
+        this.name = name;
+        this.colors = ["red", "blue", "green"];
+}
+SuperType.prototype.sayName = function(){
+    console.log(this.name);
+};
+
+function SubType(name, age){
+    SuperType.call(this, name);
+    this.age = age;
+}
+
+inheritPrototype(SubType, SuperType);
+SubType.prototype.sayAge = function(){
+    console.log(this.age);
+};
+```
+
+相对于组合继承直接用父类实例改写子类原型的做法，寄生组合式继承的方式更加细腻了一些，通过寄生的方式，通过父类的原型创建一个对象给子类的原型，这样子类的`prototype`通过`[[prototype]]`可以链接到父类，更加优雅的实现了继承，且只调用了一遍父类的构造函数。
 
 ## ES6中的继承
 
