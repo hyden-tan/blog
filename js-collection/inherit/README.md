@@ -234,6 +234,29 @@ SubType.prototype.sayAge = function(){
 
 相对于组合继承直接用父类实例改写子类原型的做法，寄生组合式继承的方式更加细腻了一些，通过寄生的方式，通过父类的原型创建一个对象给子类的原型，这样子类的`prototype`通过`[[prototype]]`可以链接到父类，更加优雅的实现了继承，且只调用了一遍父类的构造函数。
 
-## ES6中的继承
+## ES6中的class
+
+```javascript
+class A {
+    constructor(name) {
+        this.name = name;
+    }
+    sayName() {
+        console.log(this.name);
+    }
+}
+```
+
+在es6中定义了class关键字，但其依旧是function + 原型的语法糖：
+
+```javascript
+typeof A === 'function'; // true
+```
+
+可以看到A本身依旧是一个function，那A里面的方法是放到哪儿的呢？
+
+```javascript
+console.log(A.prototype)
+```
 
 ## 总结
