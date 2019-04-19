@@ -241,6 +241,9 @@ class A {
     constructor(name) {
         this.name = name;
     }
+    static getMaxNumber(a, b) {
+        return a > b ? a : b;
+    }
     sayName() {
         console.log(this.name);
     }
@@ -255,8 +258,24 @@ typeof A === 'function'; // true
 
 可以看到A本身依旧是一个function，那A里面的方法是放到哪儿的呢？
 
+![2.jpg](https://github.com/hyden-tan/blog/blob/master/js-collection/inherit/images/2.png?raw=true)
+
+可以看到，sayName是放在A的prototype上面的，这个不难解释得通，因为类的方法是可以被子类继承的，所以sayName在A的prototype上合情合理，
+
+在打印出来的原型中，并没有`getMaxNumber`,因为静态属性不能被实例继承，只能由类直接调用，所以静态属性是直接挂载到类上的，这也是为什么不能再静态属性中访问this,因为通过类直接调用的话，this指向类本身。另外要说明的是虽然静态方法是挂载类上的，但由于其是不可枚举的，所以无法通过Object.keys这样的方式取到的。
+
+![3.jpg](https://github.com/hyden-tan/blog/blob/master/js-collection/inherit/images/3.png?raw=true)
+
+到目前为止，js里还没有一个完善的私有属性的定义方式，不过在提案中已经有通过‘#’定义私有属性的方式：
+
 ```javascript
-console.log(A.prototype)
+class B {
+    #name;
+}
 ```
 
 ## 总结
+
+第一次认真写文章，前前后后写了有四五个小时吧，总算把js的原型和继承捋了一遍，有些地方可能还讲的不够细，后面会再翻看一些资料，查漏补缺。
+
+欢迎指正！[github](https://github.com/hyden-tan/blog/blob/master/js-collection/inherit/README.md)
