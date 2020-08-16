@@ -1,3 +1,6 @@
+
+```javascript
+
 /**
  * ## 规范地址
  * [英文原文](https://promisesaplus.com/)
@@ -176,3 +179,5 @@ p2.then(val => {
 // TODO: 增加catch
 // TODO: 增加all
 // TODO: 增加race
+
+```
